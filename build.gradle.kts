@@ -44,14 +44,22 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 publishing {
-    publications {
-        create<MavenPublication>("main") {
-            group = projectGroup
-            version = projectVersion
-            artifactId = "MLib"
-
-            from(components["kotlin"])
-            artifact(tasks["sourcesJar"])
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/octocat/hello-world")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
