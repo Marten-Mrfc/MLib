@@ -3,7 +3,6 @@ package mlib.api
 import mlib.api.commands.CommandController
 import mlib.api.gui.InventoryClickListener
 import mlib.api.utilities.Initializable
-import mlib.api.utilities.Messaging
 import org.bukkit.plugin.Plugin
 
 class MLib internal constructor(internal val plugin: Plugin) {
