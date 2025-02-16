@@ -5,7 +5,6 @@ import com.mojang.brigadier.Message
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.exceptions.CommandSyntaxException
 import mlib.api.commands.types.ChatCommandSyntaxException
-import mlib.api.utilities.Messaging.asMini
 import mlib.api.utilities.isOverridden
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -94,7 +93,8 @@ class DispatcherCommand(
 			Component.translatable(key, *args.map { Component.text(it.toString()) }.toTypedArray())
 		}
 		else {
-			string.asMini()
+			val mm = MiniMessage.builder().build()
+			mm.deserialize(string)
 		}
 	}
 

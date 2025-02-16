@@ -8,7 +8,7 @@ plugins {
 }
 
 val projectGroup = "mlib.api"
-val projectVersion = "0.8.1"
+val projectVersion = "0.0.1"
 
 group = projectGroup
 version = projectVersion
@@ -44,6 +44,16 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 publishing {
+    publications {
+        create<MavenPublication>("main") {
+            group = projectGroup
+            version = projectVersion
+            artifactId = "MLib"
+
+            from(components["kotlin"])
+            artifact(tasks["sourcesJar"])
+        }
+    }
     repositories {
         maven {
             name = "OSSRH"
@@ -55,7 +65,7 @@ publishing {
         }
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/octocat/hello-world")
+            url = uri("https://maven.pkg.github.com/Marten-Mrfc/MLib")
             credentials {
                 username = System.getenv("GITHUB_ACTOR")
                 password = System.getenv("GITHUB_TOKEN")
