@@ -20,10 +20,8 @@ class MLib internal constructor(internal val plugin: Plugin) {
 
 	internal val commandController = CommandController(plugin)
 	internal val guiListener = InventoryClickListener(plugin)
-	internal val messaging = Messaging(plugin)
 	internal val controllers = arrayOf<Initializable>(
 		commandController,
-		messaging,
 		guiListener
 	)
 
