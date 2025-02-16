@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 
-internal class Messaging(private val plugin: Plugin) : Initializable {
+class Messaging(private val plugin: Plugin) : Initializable {
     private val mm = MiniMessage.builder().build()
     private val placeholderAPI by lazy { plugin.softDepend<Plugin>("PlaceholderAPI") }
 
