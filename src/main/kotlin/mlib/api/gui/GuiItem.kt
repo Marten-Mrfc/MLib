@@ -14,7 +14,7 @@ class GuiItem(private val material: Material) {
     private var description: List<Component> = emptyList()
     private var amount: Int = 1
     internal var slots: IntArray = intArrayOf()
-    private var onClick: Consumer<ClickContext> = Consumer {}
+    private var onClick: Consumer<InventoryClickEvent> = Consumer {}
     private var meta: ItemMeta? = null
     private var cached: ItemStack? = null
 
@@ -23,7 +23,7 @@ class GuiItem(private val material: Material) {
     fun amount(amount: Int) = apply { this.amount = amount }
     fun slots(vararg slots: Int) = apply { this.slots = slots }
     fun meta(meta: ItemMeta) = apply { this.meta = meta }
-    fun onClick(handler: Consumer<ClickContext>) = apply { this.onClick = handler }
+    fun onClick(handler: Consumer<InventoryClickEvent>) = apply { this.onClick = handler }
 
     private fun createItem(): ItemStack {
         return cached ?: ItemStack(material, amount).apply {
@@ -38,17 +38,7 @@ class GuiItem(private val material: Material) {
     internal fun addToInventory(inventory: Inventory, slot: Int) {
         inventory.setItem(slot, createItem())
         GuiItemProcessor.registerClickHandler(inventory, slot) { event ->
-            onClick.accept(ClickContext(event))
-        }
-    }
-
-    class ClickContext(private val event: InventoryClickEvent) {
-        val player: Player get() = event.whoClicked as Player
-        val clickType = event.click
-        val slot = event.slot
-
-        fun cancel() {
-            event.isCancelled = true
+            onClick.accept(event)
         }
     }
 }
