@@ -7,8 +7,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.plugin.Plugin
 
-internal class InventoryClickListener(private val plugin: Plugin) : Listener, Initializable {
-
+// In InventoryClickListener.kt
+internal class InventoryClickListener(val plugin: Plugin) : Listener, Initializable {
     override fun initialize() {
         plugin.registerEvents(this)
     }

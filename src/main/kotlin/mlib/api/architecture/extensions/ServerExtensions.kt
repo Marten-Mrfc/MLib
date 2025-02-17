@@ -2,7 +2,6 @@
 
 package mlib.api.architecture.extensions
 
-import com.github.shynixn.mccoroutine.bukkit.registerSuspendingEvents
 import mlib.api.commands.provideCommandController
 import org.bukkit.Bukkit
 import org.bukkit.Server
@@ -22,11 +21,9 @@ var Server.whitelist: Boolean
 
 fun Plugin.registerEvents(
 	vararg listeners: Listener
-) = listeners.forEach { server.pluginManager.registerEvents(it, this) }
-
-fun Plugin.registerSuspendingEvents(
-	vararg listeners: Listener
-) = listeners.forEach { server.pluginManager.registerSuspendingEvents(it, this) }
+) = listeners.forEach {
+	server.pluginManager.registerEvents(it, this)
+}
 
 fun Permissible.allPermissions(vararg permissions: String): Boolean = permissions.all { hasPermission(it) }
 
