@@ -1,7 +1,10 @@
 package mlib.api
 
+import mlib.api.architecture.extensions.registerEvents
 import mlib.api.commands.CommandController
 import mlib.api.gui.InventoryClickListener
+import mlib.api.forms.FormSession
+import mlib.api.forms.FormListener
 import mlib.api.utilities.Initializable
 import org.bukkit.plugin.Plugin
 
@@ -19,6 +22,7 @@ class MLib internal constructor(internal val plugin: Plugin) {
 
 	internal val commandController = CommandController(plugin)
 	internal val guiListener = InventoryClickListener(plugin)
+	internal val formListener = FormListener()
 	internal val controllers = arrayOf<Initializable>(
 		commandController,
 		guiListener
@@ -31,5 +35,8 @@ class MLib internal constructor(internal val plugin: Plugin) {
 		for (controller in controllers) {
 			controller.initialize()
 		}
+
+		FormSession.initialize(plugin)
+		plugin.registerEvents(formListener)
 	}
 }
