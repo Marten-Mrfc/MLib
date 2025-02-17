@@ -1,5 +1,6 @@
 package mlib.api.forms
 
+import mlib.api.utilities.error
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -24,7 +25,7 @@ object FormSession {
 
         Bukkit.getScheduler().runTaskLater(plugin, Runnable {
             if (hasActiveForm(player)) {
-                player.sendMessage("§cForm expired!")
+                player.error("§cForm expired!")
                 remove(player)
             }
         }, form.duration * 20L)
