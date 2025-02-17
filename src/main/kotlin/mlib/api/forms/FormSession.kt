@@ -25,7 +25,7 @@ object FormSession {
 
         Bukkit.getScheduler().runTaskLater(plugin, Runnable {
             if (hasActiveForm(player)) {
-                player.error("§cForm expired!")
+                player.error("<red>Form expired!")
                 remove(player)
             }
         }, form.duration * 20L)

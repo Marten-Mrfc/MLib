@@ -14,13 +14,13 @@ class Form(
     fun show(player: Player) {
         player.closeInventory()
         FormSession.create(player, this)
-        player.message("§e$question")
-        player.message("§7Please enter your answer (Type: ${type.name})")
+        player.message("<yellow>$question")
+        player.message("<gray>Please enter your answer (Type: ${type.name})")
     }
 
     internal fun handleInput(player: Player, input: String, plugin: Plugin) {
         if (!type.validate(input)) {
-            player.error("§cInvalid input! Please enter a valid ${type.name.lowercase()}")
+            player.error("<red>Invalid input! Please enter a valid ${type.name.lowercase()}")
             return
         }
 
