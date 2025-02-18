@@ -1,67 +1,67 @@
 package mlib.api.utilities
 
+import com.google.gson.*
+import com.google.gson.reflect.TypeToken
 import org.bukkit.NamespacedKey
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.Plugin
+import java.lang.reflect.Type
 
-/**
- * Sets a custom value in the persistent data container of an ItemMeta.
- */
-@Suppress("UNCHECKED_CAST")
+private val gson = GsonBuilder()
+    .registerTypeAdapter(Class::class.java, object : JsonSerializer<Class<*>>, JsonDeserializer<Class<*>> {
+        override fun serialize(src: Class<*>, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+            return JsonPrimitive(src.name)
+        }
+
+        override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Class<*> {
+            return Class.forName(json.asString)
+        }
+    }).create()
+
 fun <T : Any> setCustomValue(meta: ItemMeta, plugin: Plugin, id: String, value: T) {
     val key = NamespacedKey(plugin, id)
+    val container = meta.persistentDataContainer
     when (value) {
-        is String -> meta.persistentDataContainer.set(key, PersistentDataType.STRING, value)
-        is Boolean -> meta.persistentDataContainer.set(key, PersistentDataType.BOOLEAN, value)
-        is Int -> meta.persistentDataContainer.set(key, PersistentDataType.INTEGER, value)
-        is Double -> meta.persistentDataContainer.set(key, PersistentDataType.DOUBLE, value)
-        is Float -> meta.persistentDataContainer.set(key, PersistentDataType.FLOAT, value)
-        is Short -> meta.persistentDataContainer.set(key, PersistentDataType.SHORT, value)
-        is Byte -> meta.persistentDataContainer.set(key, PersistentDataType.BYTE, value)
-        is List<*> -> when {
-            value.all { it is String } -> {
-                meta.persistentDataContainer.set(key, PersistentDataType.LIST.strings(), value as List<String>)
-            }
-            value.all { it is Int } -> {
-                meta.persistentDataContainer.set(key, PersistentDataType.LIST.integers(), value as List<Int>)
-            }
-        }
+        is String -> container.set(key, PersistentDataType.STRING, value)
+        is Boolean -> container.set(key, PersistentDataType.BOOLEAN, value)
+        is Int -> container.set(key, PersistentDataType.INTEGER, value)
+        is Double -> container.set(key, PersistentDataType.DOUBLE, value)
+        is Float -> container.set(key, PersistentDataType.FLOAT, value)
+        is Short -> container.set(key, PersistentDataType.SHORT, value)
+        is Byte -> container.set(key, PersistentDataType.BYTE, value)
+        is List<*> -> container.set(key, PersistentDataType.STRING, gson.toJson(value))
     }
 }
 
-/**
- * Checks if a custom value exists and matches in the persistent data container.
- */
-@Suppress("UNCHECKED_CAST")
 fun <T : Any> checkCustomValue(meta: ItemMeta, plugin: Plugin, id: String, value: T): Boolean {
     val key = NamespacedKey(plugin, id)
+    val container = meta.persistentDataContainer
     return when (value) {
-        is String -> meta.persistentDataContainer.get(key, PersistentDataType.STRING) == value
-        is Boolean -> meta.persistentDataContainer.get(key, PersistentDataType.BOOLEAN) == value
-        is Int -> meta.persistentDataContainer.get(key, PersistentDataType.INTEGER) == value
-        is Double -> meta.persistentDataContainer.get(key, PersistentDataType.DOUBLE) == value
-        is Float -> meta.persistentDataContainer.get(key, PersistentDataType.FLOAT) == value
-        is Short -> meta.persistentDataContainer.get(key, PersistentDataType.SHORT) == value
-        is Byte -> meta.persistentDataContainer.get(key, PersistentDataType.BYTE) == value
-        is List<*> -> when {
-            value.all { it is String } -> {
-                val stored = meta.persistentDataContainer.get(key, PersistentDataType.LIST.strings())
-                stored == value
+        is String -> {
+            val storedValue = container.get(key, PersistentDataType.STRING)
+            if (storedValue != null && storedValue.startsWith("[")) {
+                val type = object : TypeToken<List<String>>() {}.type
+                gson.fromJson<List<String>>(storedValue, type).contains(value)
+            } else {
+                storedValue == value
             }
-            value.all { it is Int } -> {
-                val stored = meta.persistentDataContainer.get(key, PersistentDataType.LIST.integers())
-                stored == value
-            }
-            else -> false
+        }
+        is Boolean -> container.get(key, PersistentDataType.BOOLEAN) == value
+        is Int -> container.get(key, PersistentDataType.INTEGER) == value
+        is Double -> container.get(key, PersistentDataType.DOUBLE) == value
+        is Float -> container.get(key, PersistentDataType.FLOAT) == value
+        is Short -> container.get(key, PersistentDataType.SHORT) == value
+        is Byte -> container.get(key, PersistentDataType.BYTE) == value
+        is List<*> -> {
+            val json = container.get(key, PersistentDataType.STRING)
+            val type = object : TypeToken<List<Any>>() {}.type
+            gson.fromJson<List<Any>>(json, type).contains(value)
         }
         else -> false
     }
 }
 
-/**
- * Gets a custom value from the persistent data container.
- */
 fun getCustomValue(meta: ItemMeta, plugin: Plugin, id: String): Any? {
     val key = NamespacedKey(plugin, id)
     val container = meta.persistentDataContainer
