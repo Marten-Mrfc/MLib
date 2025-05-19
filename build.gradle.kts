@@ -23,7 +23,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly(kotlin("reflect"))
     compileOnly("net.kyori:adventure-text-minimessage:4.13.1")
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("com.mojang:brigadier:1.0.18")

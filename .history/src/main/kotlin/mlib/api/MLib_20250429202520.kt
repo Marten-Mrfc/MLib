@@ -8,7 +8,6 @@ import mlib.api.forms.FormListener
 import mlib.api.utilities.ConfigManager
 import mlib.api.utilities.Debug
 import mlib.api.utilities.Initializable
-import mlib.api.utilities.debug
 import org.bukkit.plugin.Plugin
 
 class MLib internal constructor(internal val plugin: Plugin) {

@@ -14,7 +14,7 @@ abstract class KotlinPlugin : JavaPlugin() {
 	override fun onEnable() {
 		try {
 			MLib.register(this)
-			debug("MLib initialized for ${this.name}")
+			debug(this, "MLib initialized for ${this.name}")
 		} catch (e: IllegalStateException) {
 			logger.warning("MLib already initialized for ${this.name}")
 		}
@@ -55,7 +55,7 @@ abstract class KotlinPlugin : JavaPlugin() {
 	 *
 	 * @return The new debug state
 	 */
-	fun toggleDebug() {
-		return Debug.toggleDebug()
+	fun toggleDebug(): Boolean {
+		return Debug.toggleDebug(this)
 	}
 }

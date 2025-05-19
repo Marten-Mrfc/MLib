@@ -8,7 +8,7 @@ import org.bukkit.inventory.Inventory
 import java.util.concurrent.ConcurrentHashMap
 
 class Gui(private val title: Component, size: GuiSize) {
-    private val size = size.slots
+    val size = size.slots
     private val items = ConcurrentHashMap<Int, GuiItem>()
     private var fillItem: GuiItem? = null
 
@@ -22,7 +22,9 @@ class Gui(private val title: Component, size: GuiSize) {
     }
 
     fun fill(material: Material, init: GuiItem.() -> Unit = {}) {
-        fillItem = GuiItem(material).apply(init)
+        fillItem = GuiItem(material).onClick { event ->
+            event.isCancelled = true
+        }.apply(init)
         for (i in 0 until size) {
             if (!items.containsKey(i)) {
                 items[i] = fillItem!!
@@ -32,7 +34,7 @@ class Gui(private val title: Component, size: GuiSize) {
 
     fun border(material: Material, init: GuiItem.() -> Unit = {}) {
         val item = GuiItem(material).apply(init)
-        val rows = size / 9
+        size / 9
         for (i in 0 until size) {
             if (i < 9 || i >= size - 9 || i % 9 == 0 || i % 9 == 8) {
                 if (!items.containsKey(i)) {

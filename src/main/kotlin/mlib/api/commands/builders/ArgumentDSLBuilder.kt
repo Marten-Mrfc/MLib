@@ -15,7 +15,7 @@ open class ArgumentDSLBuilder<T>(
 ) : ContinuableNodeDSLBuilder<RequiredArgumentBuilder<CommandSender, ArgumentDSLBuilder<T>>>(plugin) {
 
 	var suggestionsProvider: SuggestionProvider<CommandSender>? = null
-		private set
+		internal set
 
 
 	fun suggests(provider: BrigadierCommandContext<CommandSender>.(builder: SuggestionsBuilder) -> Unit) {

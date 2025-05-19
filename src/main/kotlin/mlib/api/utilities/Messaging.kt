@@ -22,11 +22,13 @@ private fun getPlugin(any: Any): Plugin? {
 }
 
 private fun String.withPlaceholders(player: Player?): String {
-    val plugin = getPlugin(player ?: this) ?: return this
-    val placeholderAPI = plugin.softDepend<Plugin>("PlaceholderAPI")
-
-    return if (player != null && placeholderAPI != null) {
-        me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, this)
+    return if (player != null) {
+        try {
+            Class.forName("me.clip.placeholderapi.PlaceholderAPI")
+            me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, this)
+        } catch (e: ClassNotFoundException) {
+            this
+        }
     } else {
         this
     }
@@ -59,5 +61,13 @@ fun CommandSender.message(message: String, player: Player? = null) {
 
 fun String.asPluginMessage(player: Player? = null): Component {
     val plugin = getPlugin(this) ?: return asMini(player)
-    return "<gold><bold>${plugin.name}</bold><gray> | <white> $this".withPlaceholders(player).asMini()
+    return "<gold><bold>${plugin.name}</bold><gray> | <white> $this".withPlaceholders(player).asMini(player)
+}
+
+fun CommandSender.action(message: String) {
+    if (this is Player) {
+        sendActionBar { message.asMini(this) }
+    } else {
+        sendMessage(message.asMini())
+    }
 }
