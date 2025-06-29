@@ -9,6 +9,7 @@ import mlib.api.commands.implementation.tree.nodes.BrigadierLiteral
 import mlib.api.commands.implementation.tree.nodes.BrigadierRoot
 import mlib.api.architecture.extensions.registerEvents
 import mlib.api.architecture.extensions.server
+import mlib.api.utilities.debug
 import org.bukkit.command.CommandSender
 import org.bukkit.command.SimpleCommandMap
 import org.bukkit.event.EventHandler
@@ -39,7 +40,7 @@ open class Dispatcher protected constructor(private val root: BrigadierRoot) :
 
 	open fun register(nodes: List<CommandNode<CommandSender>>) {
 		for (node in nodes) {
-			getRoot().addChild(node)
+			root.addChild(node)
 		}
 	}
 
@@ -47,9 +48,21 @@ open class Dispatcher protected constructor(private val root: BrigadierRoot) :
 	 * Registers the command by the given node.
 	 *
 	 * @param node that must be registered
+	 * @param replace if true, will replace existing command with same name
+	 */
+	open fun register(node: LiteralCommandNode<CommandSender>, replace: Boolean = false) {
+		debug("[Dispatcher] Registering command '${node.name}' with replace=$replace")
+		root.addChild(node, replace)
+		debug("[Dispatcher] Command '${node.name}' registration completed")
+	}
+
+	/**
+	 * Registers the command by the given node (backward compatibility).
+	 *
+	 * @param node that must be registered
 	 */
 	open fun register(node: LiteralCommandNode<CommandSender>) {
-		root.addChild(node)
+		register(node, false)
 	}
 
 	/**

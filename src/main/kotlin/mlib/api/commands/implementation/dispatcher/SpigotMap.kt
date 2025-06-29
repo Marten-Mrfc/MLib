@@ -3,6 +3,7 @@ package mlib.api.commands.implementation.dispatcher
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.tree.LiteralCommandNode
 import mlib.api.commands.implementation.tree.nodes.AliasableCommandNode
+import mlib.api.utilities.debug
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.SimpleCommandMap
@@ -17,11 +18,41 @@ internal class SpigotMap(var prefix: String, var plugin: Plugin, var map: Simple
 	lateinit var dispatcher: CommandDispatcher<CommandSender>
 
 	override fun register(node: LiteralCommandNode<CommandSender>): DispatcherCommand? {
+		debug("SpigotMap attempting to register command '${node.name}'")
+		debug("knownCommands contains '${node.name}': ${knownCommands.containsKey(node.name)}")
+		
 		if (knownCommands.containsKey(node.name)) {
+			debug("Command '${node.name}' already exists, returning null")
 			return null
 		}
 		val wrapped = wrap(node)
+		debug("Registering wrapped command '${node.name}' with map")
 		map.register(prefix, wrapped)
+		debug("Successfully registered command '${node.name}'")
+		return wrapped
+	}
+
+	/**
+	 * Register a command with support for replacing existing commands
+	 */
+	fun registerWithReplace(node: LiteralCommandNode<CommandSender>, replace: Boolean = false): DispatcherCommand? {
+		debug("SpigotMap attempting to register command '${node.name}' with replace=$replace")
+		debug("knownCommands contains '${node.name}': ${knownCommands.containsKey(node.name)}")
+		
+		if (knownCommands.containsKey(node.name)) {
+			if (replace) {
+				debug("Command '${node.name}' already exists, unregistering first")
+				unregister(node.name)
+			} else {
+				debug("Command '${node.name}' already exists and replace=false, returning null")
+				return null
+			}
+		}
+		
+		val wrapped = wrap(node)
+		debug("Registering wrapped command '${node.name}' with map")
+		map.register(prefix, wrapped)
+		debug("Successfully registered command '${node.name}'")
 		return wrapped
 	}
 
@@ -45,7 +76,9 @@ internal class SpigotMap(var prefix: String, var plugin: Plugin, var map: Simple
 				aliases.add(alias.name)
 			}
 		}
-		return DispatcherCommand(node.name, plugin, dispatcher, node.usageText, aliases)
+		val command = DispatcherCommand(node.name, plugin, dispatcher, node.usageText, aliases)
+		debug("Created DispatcherCommand '${node.name}' with tab completion support")
+		return command
 	}
 
 

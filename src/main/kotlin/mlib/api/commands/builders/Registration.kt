@@ -22,3 +22,20 @@ inline fun Plugin.command(
 
 	return node
 }
+
+/**
+ * Creates and registers a command that can be replaced if it already exists.
+ * This is useful for hot-reloading scenarios.
+ */
+inline fun Plugin.reloadableCommand(
+	name: String,
+	register: Boolean = true,
+	crossinline builder: LiteralDSLBuilder.() -> Unit
+): BrigadierLiteral<CommandSender> {
+	val node = LiteralDSLBuilder(this, name)
+		.apply(builder).build()
+
+	if (register) Dispatcher.of(this).register(node, true) // true = replace existing
+
+	return node
+}

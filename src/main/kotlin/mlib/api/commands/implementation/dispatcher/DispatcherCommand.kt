@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.Message
 import com.mojang.brigadier.StringReader
 import com.mojang.brigadier.exceptions.CommandSyntaxException
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import mlib.api.commands.types.ChatCommandSyntaxException
 import mlib.api.utilities.isOverridden
 import net.kyori.adventure.text.Component
@@ -14,6 +15,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.PluginIdentifiableCommand
+import org.bukkit.command.TabCompleter
 import org.bukkit.plugin.Plugin
 import java.lang.reflect.Method
 import kotlin.math.max
@@ -52,6 +54,36 @@ class DispatcherCommand(
 		}
 
 		return true
+	}
+
+	override fun tabComplete(sender: CommandSender, alias: String, args: Array<out String>): List<String> {
+		try {
+			// Build the command string that Brigadier expects
+			val commandString = if (args.isNotEmpty()) {
+				"$alias ${args.joinToString(" ")}"
+			} else {
+				alias
+			}
+			
+			val reader = StringReader(commandString)
+			
+			// Skip the leading slash if present
+			if (reader.canRead() && reader.peek() == '/') {
+				reader.skip()
+			}
+			
+			// Get suggestions from Brigadier
+			val suggestions = dispatcher.getCompletionSuggestions(
+				dispatcher.parse(reader, sender),
+				reader.totalLength
+			).join()
+			
+			// Convert Brigadier suggestions to Bukkit format
+			return suggestions.list.map { it.text }
+		} catch (e: Exception) {
+			// If there's any error, return empty list
+			return emptyList()
+		}
 	}
 
 	override fun getPlugin(): Plugin {
